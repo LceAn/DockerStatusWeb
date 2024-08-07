@@ -17,17 +17,17 @@
 .
 ├── app
 │   ├── __init__.py
-│   ├── config.py
-│   ├── models
+│   ├── config.py    //配置信息
+│   ├── models      //功能模块
 │   │   ├── __init__.py
 │   │   └── model.py
-│   ├── src
-│   ├── templates
+│   ├── src   //本地资源处，如css、img、js等
+│   ├── templates   // HTML页面位置
 │   │   └── index.html
-│   └── views
+│   └── views      //主路由位置，设置web请求、传参处
 │       ├── __init__.py
 │       └── main.py
-└── manager.py
+└── manager.py      //主运行函数
 ```
 
 # 使用方法
