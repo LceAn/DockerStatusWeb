@@ -27,6 +27,7 @@
         Flask
         requests
         psutil
+     ```
    - Docker
     1. 安装Docker
     2. 安装监听2375端口容器socat
