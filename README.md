@@ -3,6 +3,7 @@
 
 # 更新记录
 - 20240807_V0.0.1：创建项目，初步实现单端效果
+- 20240807_V0.0.2：将目录结构更改为MVC
 
 
 # 长期规划
@@ -14,9 +15,19 @@
 # 目录结构
 ```
 .
-├── main.py
-└── templates
-    └── index.html
+├── app
+│   ├── __init__.py
+│   ├── config.py
+│   ├── models
+│   │   ├── __init__.py
+│   │   └── model.py
+│   ├── src
+│   ├── templates
+│   │   └── index.html
+│   └── views
+│       ├── __init__.py
+│       └── main.py
+└── manager.py
 ```
 
 # 使用方法
