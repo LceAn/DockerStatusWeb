@@ -21,8 +21,8 @@
 # 使用方法
 1. 前期准备
    - Python
-     1. 安装Python
-     2. 需要安装模块
+   1. 安装Python
+   2. 需要安装模块
      ```
         Flask
         requests
