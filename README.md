@@ -52,9 +52,9 @@
             tcp-listen:2375,fork,reuseaddr unix-connect:/var/run/docker.sock
     ```
 
-3. 运行 main.py
+3. 运行
 ```
-python main.py
+python manager.py
 ```
 4. 运行成功后，访问Web页面 `http://127.0.0.1:5000`
    ![image](https://github.com/user-attachments/assets/2f38fa00-c06d-406d-848a-7d7c3d032d46)
