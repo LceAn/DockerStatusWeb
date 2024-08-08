@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker 容器统计信息</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            position:fixed;
+            top: 30px;
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .card {
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            text-align: left;
+        }
+       .card_item{
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            width: 98%;
+            text-align: left;
+        }
+        .icon{
+          margin-right:10px;
+        }
+        .collapsible {
+            background-color: #007bff;
+            color: white;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .collapsible h2, .collapsible p {
+            margin: 10px;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            overflow: hidden;
+            width: 100%;
+            max-height: 0;
+            flex-direction: row;
+            transform: rotateX(-90deg);
+            transform-origin: center top;
+            transition: transform 0.3s ease;
+            will-change: max-height;
+        }
+        .active{
+            max-height: 100%;
+            transform: rotateX(0deg);
+        }
+
+        .grid-item {
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            text-align: left;
+            width: 300px;
+        }
+        #loading {
+            display: none;
+            color: #007bff;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container card">
+    <div class="card_item">
+        <div style="display: flex; align-items: center; cursor: pointer;">
+            <div class="icon" id="icon">
+                <img src="../static/images/right.png" alt="Docker" width="10" height="10">
+            </div>
+            <div id="localhost-card" style="width:100%;">
+                <!-- 本机资源信息将放在这里 -->
+            </div>
+
+        </div>
+
+        <div class="content" id="grid-container">
+            <div class="content_item">
+                <!-- Docker 容器信息将放在这里 -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function fetchLocalhostStats() {
+        const response = await fetch('/api/localhost');
+        const localhost = await response.json();
+
+        const localhostCard = document.getElementById('localhost-card');
+        localhostCard.innerHTML = `
+            <div class="collapsible">
+                <h2>${localhost.name}</h2>
+                <p>CPU 使用率: ${localhost.cpu_usage}% / ${localhost.cpu_limit}%
+                内存使用量: ${localhost.memory_usage}MB / ${localhost.memory_limit}MB (${localhost.memory_usage_percent}%)
+                硬盘使用量: ${localhost.volume_usage}GB / ${localhost.volume_limit}GB (${localhost.volume_usage_percent}%)
+                网络IO: ${localhost.network_rx_rate}K/s / ${localhost.network_tx_rate}K/s
+                流量: ${localhost.rx_bytes}GB / ${localhost.tx_bytes}GB</p>
+            </div>
+        `;
+        fetchContainerStats();
+        let isShow = false;
+        const icon = document.getElementById('icon');
+        icon.addEventListener("click", function() {
+
+            const content = document.getElementById('grid-container');
+            if (isShow) {
+                content.classList.remove('active');
+                icon.innerHTML=`<img src="../static/images/right.png" alt="Docker" width="10" height="10">`;
+                isShow = false;
+            } else {
+                isShow = true;
+                content.classList.add('active');
+                icon.innerHTML=`<img src="../static/images/down.png" alt="Docker" width="10" height="10">`;
+
+            }
+        });
+    }
+
+    async function fetchContainerStats() {
+        const response = await fetch('/api/containers');
+        const containers = await response.json();
+
+        const gridContainerDiv = document.getElementById('grid-container');
+        gridContainerDiv.innerHTML = '';
+
+        containers.forEach(container => {
+            const card = document.createElement('div');
+            card.className = 'grid-item';
+
+            const title = document.createElement('h2');
+            title.textContent = container.name;
+            card.appendChild(title);
+
+            const cpuUsage = document.createElement('p');
+            cpuUsage.textContent = `CPU 使用率: ${container.cpu_usage}% / ${container.cpu_limit}%`;
+            card.appendChild(cpuUsage);
+
+            const memoryUsage = document.createElement('p');
+            memoryUsage.textContent = `内存使用量: ${container.memory_usage}MB / ${container.memory_limit}MB (${container.memory_usage_percent}%)`;
+            card.appendChild(memoryUsage);
+
+            const volumeUsage = document.createElement('p');
+            volumeUsage.textContent = `硬盘使用量: ${container.volume_usage}GB / ${container.volume_limit}GB (${container.volume_usage_percent}%)`;
+            card.appendChild(volumeUsage);
+
+            const networkIO = document.createElement('p');
+            networkIO.textContent = `网络IO: ${container.network_rx_rate}K/s / ${container.network_tx_rate}K/s`;
+            card.appendChild(networkIO);
+
+            const traffic = document.createElement('p');
+            traffic.textContent = `流量: ${container.rx_bytes}GB / ${container.tx_bytes}GB`;
+            card.appendChild(traffic);
+
+            gridContainerDiv.appendChild(card);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchLocalhostStats();
+    });
+</script>
+</body>
+</html>
